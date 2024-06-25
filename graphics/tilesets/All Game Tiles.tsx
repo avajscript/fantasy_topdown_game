@@ -2,6 +2,9 @@
 <tileset version="1.10" tiledversion="1.10.2" name="All Game Tiles" tilewidth="32" tileheight="32" tilecount="764" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
+  <properties>
+   <property name="type" value="water"/>
+  </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Middle.png"/>
  </tile>
  <tile id="1">
@@ -44,6 +47,9 @@
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-12.png"/>
  </tile>
  <tile id="14">
+  <properties>
+   <property name="type" value="ground"/>
+  </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_2_Middle.png"/>
  </tile>
  <tile id="15">

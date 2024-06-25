@@ -1,5 +1,6 @@
 import sys
 import pygame as pg
+import pytmx
 from pytmx.util_pygame import load_pygame
 
 pg.init()
@@ -15,6 +16,7 @@ map_one_tmx = load_pygame("graphics/main_map.tmx")
 
 # Constants
 TILE_WIDTH = 16
+PLAYER_WALK_BUFFER =200
 
 from images import player_images, player_actions
 
@@ -35,6 +37,8 @@ from pygame.locals import (
     RLEACCEL
 )
 
+
+
 layers = map_one_tmx.visible_layers
 
 
@@ -46,11 +50,14 @@ class Tile(pg.sprite.Sprite):
 
 sprite_group = pg.sprite.Group()
 
-for layer in layers:
+for layer_idx, layer in enumerate(layers):
     if hasattr(layer, 'data'):
         for x, y, surf in layer.tiles():
+            properties = map_one_tmx.get_tile_properties(x, y, layer_idx)
             pos = (x * TILE_WIDTH, y * TILE_WIDTH)
             Tile(pos=pos, surf=surf, groups=sprite_group)
+            print("properties")
+            print(properties)
 
 
 
@@ -78,8 +85,9 @@ player_anim_dict = {
 class Player(pg.sprite.Sprite):
     def __init__(self, x, y):
         super(Player, self).__init__()
-        self.x = x
-        self.y = y
+        self.pos = [x * TILE_WIDTH, y * TILE_WIDTH]
+        self.dirvec = (0, 0)
+        self.new_pos = [x * TILE_WIDTH, y * TILE_WIDTH]
         self.player_images = player_images
         self.player_images[0].iter()
         self.player_action_images = player_actions
@@ -87,55 +95,83 @@ class Player(pg.sprite.Sprite):
         self.image = player_images[0].next()
         self.image_row = player_images[0]
         self.current_keys = (0, 0)
-        self.moving_timer = pg.time.get_ticks()
+        self.keys_pressed = []
+
 
     def press_key(self, pressed_keys):
-        if self.current_keys[1] != K_UP and (pressed_keys[K_UP] or pressed_keys[K_w]):
-            self.current_keys = (K_a, K_UP)
+
+        # Key up
+        if pressed_keys[K_UP] or pressed_keys[K_w]:
+            self.keys_pressed.append("up")
+            self.dirvec = (0, -1)
             self.image_row = self.player_images[player_anim_dict["upWalk"]]
             self.image = self.image_row.iter()
-        elif self.current_keys[1] != K_RIGHT and (pressed_keys[K_RIGHT] or pressed_keys[K_d]):
-            self.current_keys = (K_d, K_RIGHT)
+        # Key right
+        elif (pressed_keys[K_RIGHT] or pressed_keys[K_d]):
+            self.keys_pressed.append("right")
+            self.dirvec = (1, 0)
             self.image_row = self.player_images[player_anim_dict["rightWalk"]]
             self.image = self.image_row.iter()
-        elif self.current_keys[1] != K_DOWN and (pressed_keys[K_DOWN] or pressed_keys[K_s]):
-            self.current_keys = (K_s, K_DOWN)
+        # Key down
+        elif pressed_keys[K_DOWN] or pressed_keys[K_s]:
+            self.keys_pressed.append("down")
+            self.dirvec = (0, 1)
             self.image_row = self.player_images[player_anim_dict["downWalk"]]
             self.image = self.image_row.iter()
-        elif self.current_keys[1] != K_LEFT and (pressed_keys[K_LEFT] or pressed_keys[K_a]):
-            self.current_keys = (K_a, K_LEFT)
+        # Key left
+        elif pressed_keys[K_LEFT] or pressed_keys[K_a]:
+            self.keys_pressed.append("left")
+            self.dirvec = (-1, 0)
             self.image_row = self.player_images[player_anim_dict["leftWalk"]]
             self.image = self.image_row.iter()
 
 
     def update(self):
+        # Going left
+        if self.new_pos[0] - self.pos[0] < 0:
+            self.pos[0] -= 1
+        # Going right
+        elif self.new_pos[0] - self.pos[0] > 0:
+            self.pos[0] += 1
+        # Going up
+        elif self.new_pos[1] - self.pos[1] < 0:
+            self.pos[1] -= 1
+        # Going down
+        elif self.new_pos[1] - self.pos[1] > 0:
+            self.pos[1] += 1
+        # If still in movement
+        if self.new_pos == self.pos:
+            # If key is pressed
+            if len(self.keys_pressed):
+                # Set new x coordinate position
+                new_pos = (self.dirvec[0] * TILE_WIDTH, self.dirvec[1] * TILE_WIDTH)
+                # Update the new position based on current player coordinates
+                self.new_pos = [self.pos[0] + new_pos[0], self.pos[1] + new_pos[1]]
+
+
+
 
     def release_key(self, key):
+        key_to_remove = ""
         # Check to see if key is the currently pressed key being released.
         # Then set the walking speed
-        if key == self.current_keys[0] or key == self.current_keys[1]:
-            # Reset keys to none being pressed
-            self.current_keys = (0, 0)
+        if self.dirvec != (0, 0):
             if key == K_UP or key == K_w:
                 self.image_row = self.player_images[player_anim_dict["up"]]
+                key_to_remove = "up"
             elif key == K_RIGHT or key == K_d:
                 self.image_row = self.player_images[player_anim_dict["right"]]
+                key_to_remove = "right"
             elif key == K_DOWN or key == K_s:
                 self.image_row = self.player_images[player_anim_dict["down"]]
+                key_to_remove = "down"
             elif key == K_LEFT or key == K_a:
                 self.image_row = self.player_images[player_anim_dict["left"]]
-
-    # if self.image_row == self.player_images[player_anim_dict["upWalk"]]:
-    #         self.image_row = self.player_images[player_anim_dict["up"]]
-    #     elif self.image_row == self.player_images[player_anim_dict["rightWalk"]]:
-    #         self.image_row = self.player_images[player_anim_dict["right"]]
-    #     elif self.image_row == self.player_images[player_anim_dict["downWalk"]]:
-    #         self.image_row = self.player_images[player_anim_dict["down"]]
-    #     elif self.image_row == self.player_images[player_anim_dict["leftWalk"]]:
-    #         self.image_row = self.player_images[player_anim_dict["left"]]
+                key_to_remove = "left"
+        self.keys_pressed = [key_press for key_press in self.keys_pressed if key_press != key_to_remove]
     def draw(self, screen):
         self.image = self.image_row.next()
-        screen.blit(self.image, (self.x * TILE_WIDTH, self.y * TILE_WIDTH))
+        screen.blit(self.image, (self.pos[0], self.pos[1]))
 
 
 running = True
@@ -144,7 +180,7 @@ running = True
 # player_images[n].iter()
 # image = player_images[n].next()
 
-player = Player(0, 0)
+player = Player(5, 5)
 
 
 while running:
@@ -158,13 +194,13 @@ while running:
                     or pressed_keys[K_DOWN] or pressed_keys[K_s] or pressed_keys[K_LEFT] or pressed_keys[K_a]):
                 player.press_key(pressed_keys)
         elif e.type == pg.KEYUP:
-            print("e")
-            print(e)
             if (e.key == K_UP or e.key == K_w or e.key == K_RIGHT or e.key == K_d
                     or e.key == K_DOWN or e.key == K_s or e.key == K_LEFT or e.key == K_a):
                 player.release_key(e.key)
 
+    player.update()
     sprite_group.draw(screen)
+
     player.draw(screen)
     pg.display.flip()
     clock.tick(FPS)

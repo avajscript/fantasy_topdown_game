@@ -8,11 +8,11 @@
     ],
     "fileStates": {
         "main_map.tmx": {
-            "scale": 3,
-            "selectedLayer": 0,
+            "scale": 2,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 653,
-                "y": 619.8333333333333
+                "x": 327.25,
+                "y": 272.5
             }
         },
         "tilesets/All Game Tiles.tsx": {
@@ -56,6 +56,7 @@
         "tilesets/All Game Tiles.tsx"
     ],
     "project": "fantasy_project.tiled-project",
+    "property.type": "string",
     "recentFiles": [
         "tilesets/All Game Tiles.tsx",
         "main_map.tmx",
