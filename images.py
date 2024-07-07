@@ -3,8 +3,9 @@ import copy
 from spritesheet import Spritesheet, SpriteStripAnim
 import os
 path = "graphics/Cute_Fantasy"
+split_tiles_path = "graphics/split_tiles"
 FPS = 60
-frames  = FPS / 10
+frames = FPS / 10
 player_images = [
     # down
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 0, 32, 32), 6, -1, True, frames),
@@ -50,3 +51,39 @@ player_actions = [
     SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 480, 48, 48), 2, 1, True, frames),
     SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 528, 48, 48), 2, 1, True, frames),
 ]
+
+door_animation = SpriteStripAnim(os.path.join(path, "House/Walls/Wood_Door_Anim.png"), (0, 0, 16, 16), 6, 1, False, frames, "door")
+chest_animation = SpriteStripAnim(os.path.join(path, "House/Objects/Chest_Anim.png"), (0, 0, 16, 16), 6, 1, False, frames, "chest")
+
+door_animation_images = [
+    pg.image.load(os.path.join(split_tiles_path, "house/walls/Wood_Door_Anim-0.png")).convert_alpha(),
+    pg.image.load(os.path.join(split_tiles_path, "house/walls/Wood_Door_Anim-1.png")).convert_alpha(),
+    pg.image.load(os.path.join(split_tiles_path, "house/walls/Wood_Door_Anim-2.png")).convert_alpha(),
+    pg.image.load(os.path.join(split_tiles_path, "house/walls/Wood_Door_Anim-3.png")).convert_alpha(),
+    pg.image.load(os.path.join(split_tiles_path, "house/walls/Wood_Door_Anim-4.png")).convert_alpha(),
+    pg.image.load(os.path.join(split_tiles_path, "house/walls/Wood_Door_Anim-5.png")).convert_alpha(),
+]
+
+inventory_slot_img = pg.image.load(os.path.join(split_tiles_path, "inventory/InventorySlots-14.png"))
+inventory_row_horizontal_img = pg.image.load(os.path.join(split_tiles_path, "inventory/InventorySlots-15.png"))
+inventory_img = pg.image.load(os.path.join(split_tiles_path, "inventory/InventorySlots-5.png"))
+
+# Tools
+arrow_img = pg.image.load(os.path.join(split_tiles_path, "icons/arrow.png"))
+axe_img = pg.image.load(os.path.join(split_tiles_path, "icons/axe.png"))
+bow_img = pg.image.load(os.path.join(split_tiles_path, "icons/bow.png"))
+hammer_img = pg.image.load(os.path.join(split_tiles_path, "icons/hammer.png"))
+pickaxe_img = pg.image.load(os.path.join(split_tiles_path, "icons/pickaxe.png"))
+sword_img = pg.image.load(os.path.join(split_tiles_path, "icons/sword.png"))
+teapot_img = pg.image.load(os.path.join(split_tiles_path, "icons/teapot.png"))
+
+
+
+
+
+
+
+
+
+
+

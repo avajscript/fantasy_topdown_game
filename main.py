@@ -1,13 +1,16 @@
+import copy
+import string
 import sys
 import pygame as pg
 import pytmx
 from pytmx.util_pygame import load_pygame
+import constants
+from spritesheet import AnimationList
+from enum import Enum
 
 pg.init()
 pg.mixer.init()
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 640
-screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pg.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
 map_one_tmx = load_pygame("graphics/main_map.tmx")
 
 # get layers
@@ -15,13 +18,17 @@ map_one_tmx = load_pygame("graphics/main_map.tmx")
 #     print(layer)
 
 # Constants
-TILE_WIDTH = 16
-PLAYER_WALK_BUFFER = 200
-GAME_WIDTH_TILES = 50
-GAME_HEIGHT_TILES = 40
+
+# Enums
 
 
-from images import player_images, player_actions
+from classes.Inventory import Inventory, InventoryDrawing, Item
+
+from images import (player_images, player_actions,
+                    door_animation, chest_animation,
+                    inventory_img, inventory_row_horizontal_img, inventory_slot_img,
+                    )
+from spritesheet import AnimationList
 
 from pygame.locals import (
     K_UP,
@@ -32,6 +39,9 @@ from pygame.locals import (
     K_d,
     K_s,
     K_a,
+    K_q,
+    K_e,
+    K_SPACE,  # Object interaction button
     K_ESCAPE,
     K_RETURN,
     QUIT,
@@ -40,24 +50,59 @@ from pygame.locals import (
     RLEACCEL
 )
 
+# special action keys that caused a player event
+ACTION_KEYS = [K_SPACE, K_q, K_e]
+MOVEMENT_KEYS = [K_w, K_d, K_s, K_a, K_UP, K_RIGHT, K_DOWN, K_LEFT]
 
-
-layers = map_one_tmx.visible_layers
 
 animations_dict = {
 }
 
-animations_dict["door"] = [
-    map_one_tmx.get_tile_properties_by_gid(280),
-    map_one_tmx.get_tile_properties_by_gid(281),
-    map_one_tmx.get_tile_properties_by_gid(282),
-    map_one_tmx.get_tile_properties_by_gid(283),
-    map_one_tmx.get_tile_properties_by_gid(284),
-    map_one_tmx.get_tile_properties_by_gid(285),
-]
+
+animations_dict["door"] = door_animation
+
+animations_dict["chest"] = chest_animation
+
+animations = []
+running_animation_names = []
+loaded_files = []
+
+def door_animation(x, y):
+    animations_dict["door"].x = x * constants.TILE_WIDTH
+    animations_dict["door"].y = y * constants.TILE_WIDTH
+
+    # animations_dict.iter()
+    animations.append(animations_dict["door"])
 
 
-tile_array = [[None for _ in range(GAME_WIDTH_TILES + 1)] for _ in range(GAME_HEIGHT_TILES + 1)]
+def chest_animation(x, y):
+    animations_dict["chest"].x = x * constants.TILE_WIDTH
+    animations_dict["chest"].y = y * constants.TILE_WIDTH
+    # animations_dict.iter()
+    animations.append(animations_dict["chest"])
+
+def chest_one():
+    pass
+
+function_dict = {
+    "door": door_animation,
+    "chest": chest_animation,
+    "chest1": chest_one
+}
+
+
+class GameMap:
+    def __init__(self):
+        self.tile_array = [[None for _ in range(constants.GAME_WIDTH_TILES + 1)] for _ in range(constants.GAME_HEIGHT_TILES + 1)]
+        self.sprite_group = pg.sprite.Group()
+    def get_tiles(self, tile_sprite):
+        sprite_collisions = []
+        for sprite in pg.sprite.spritecollide(tile_sprite, self.sprite_group, False):
+            sprite_collisions.append(sprite)
+        return sprite_collisions
+
+
+# x, y coordinates that match the tile in that position [50][40]
 
 class Tile(pg.sprite.Sprite):
     def __init__(self, pos, surf, groups, properties, coords):
@@ -67,20 +112,24 @@ class Tile(pg.sprite.Sprite):
         self.properties = properties
         self.coords = coords
 
-sprite_group = pg.sprite.Group()
 
+layers = map_one_tmx.layers
+game_map = GameMap()
 for layer_idx, layer in enumerate(layers):
-    if hasattr(layer, 'data'):
+    # Iterate over object layer
+    if isinstance(layer, pytmx.TiledObjectGroup):
+        for obj in layer:
+            x, y = int(obj.x/constants.TILE_WIDTH), int(obj.y/constants.TILE_WIDTH)
+            pos = (x * constants.TILE_WIDTH, y * constants.TILE_WIDTH)
+            tile = Tile(pos=pos, surf=obj.image, groups=game_map.sprite_group, properties=obj.properties, coords=(x, y))
+            game_map.tile_array[x][y] = tile
+    # Iterate over tile layers
+    elif hasattr(layer, 'data'):
         for x, y, surf in layer.tiles():
-            #print(f"x: {x}, y: {y}, surf: {surf}")
             properties = map_one_tmx.get_tile_properties(x, y, layer_idx)
-            pos = (x * TILE_WIDTH, y * TILE_WIDTH)
-            #print("props")
-            #print(properties)
-            tile = Tile(pos=pos, surf=surf, groups=sprite_group, properties=properties, coords=(x, y))
-            tile_array[x][y] = tile
-
-
+            pos = (x * constants.TILE_WIDTH, y * constants.TILE_WIDTH)
+            tile = Tile(pos=pos, surf=surf, groups=game_map.sprite_group, properties=properties, coords=(x, y))
+            game_map.tile_array[x][y] = tile
 
 clock = pg.time.Clock()
 FPS = 60
@@ -103,12 +152,20 @@ player_anim_dict = {
 }
 
 
+class Game:
+    def __init__(self, inventory):
+        self.inventory_draw_state: InventoryDrawing = InventoryDrawing.FULL_INVENTORY
+        self.inventory: Inventory = inventory
+    def draw(self, screen):
+        inventory.draw(screen, self.inventory_draw_state)
+
+
 class Player(pg.sprite.Sprite):
     def __init__(self, x, y):
         super(Player, self).__init__()
-        self.pos = pg.math.Vector2(x * TILE_WIDTH, y * TILE_WIDTH)
+        self.pos = pg.math.Vector2(x * constants.TILE_WIDTH, y * constants.TILE_WIDTH)
         self.dirvec = pg.math.Vector2(0, 0)
-        self.new_pos = [x * TILE_WIDTH, y * TILE_WIDTH]
+        self.new_pos = [x * constants.TILE_WIDTH, y * constants.TILE_WIDTH]
         self.point = pg.math.Vector2(x, y)
         self.player_images = player_images
         self.player_images[0].iter()
@@ -117,7 +174,6 @@ class Player(pg.sprite.Sprite):
         self.image_row = player_images[0]
         self.current_keys = (0, 0)
         self.keys_pressed = []
-
 
     def press_key(self, pressed_keys):
 
@@ -146,7 +202,6 @@ class Player(pg.sprite.Sprite):
             self.image_row = self.player_images[player_anim_dict["leftWalk"]]
             self.image = self.image_row.iter()
 
-
     def update(self):
         # Going left
         if self.new_pos[0] - self.pos[0] < 0:
@@ -165,29 +220,28 @@ class Player(pg.sprite.Sprite):
             # If key is pressed
             if len(self.keys_pressed):
                 new_point = self.point + self.dirvec
-                new_point_tile = tile_array[int(new_point.x)][int(new_point.y)]
+                new_point_tile = game_map.tile_array[int(new_point.x)][int(new_point.y)]
+                # Exit function and do nothing if the next tile doesn't exit
                 if new_point_tile is None:
                     return
-                print("tile")
-                print(new_point_tile.properties)
+                # If player can't move through tile
                 if not new_point_tile.properties['traversable']:
-                    print("new point tile")
-                    print(new_point_tile.properties)
-                    print("player position")
-                    print(self.pos)
-                    print("player xy")
-                    print(self.point)
+                    # For tiles that walking into causes an interaction
+                    if 'movement_interactable' in new_point_tile.properties:
+                        if new_point_tile.properties['movement_interactable']:
+                            interaction_type = new_point_tile.properties['interaction_type']
+                            # Performs a function based on the corresponding tile location and tile type
+                            if interaction_type in running_animation_names:
+                                return
+                            function_dict[interaction_type](new_point.x, new_point.y)
+                            running_animation_names.append(interaction_type)
+                    # Exit
                     return
                 self.point = new_point
-                print("point")
-                print(self.point)
                 # Set new x coordinate position
-                new_pos = pg.math.Vector2(self.dirvec[0] * TILE_WIDTH, self.dirvec[1] * TILE_WIDTH)
+                new_pos = pg.math.Vector2(self.dirvec[0] * constants.TILE_WIDTH, self.dirvec[1] * constants.TILE_WIDTH)
                 # Update the new position based on current player coordinates
                 self.new_pos = self.new_pos + new_pos
-
-
-
 
     def release_key(self, key):
         key_to_remove = ""
@@ -207,9 +261,32 @@ class Player(pg.sprite.Sprite):
                 self.image_row = self.player_images[player_anim_dict["left"]]
                 key_to_remove = "left"
         self.keys_pressed = [key_press for key_press in self.keys_pressed if key_press != key_to_remove]
+
+    def action_event(self, key):
+        if key == K_q:
+            print("q")
+        elif key == K_e:
+            print("e")
+            # Perform the interaction based on the tile in front of the player
+        elif key == K_SPACE:
+            # get the tile the player is interacting with (in front of him)
+            new_point = self.point + self.dirvec
+            new_point_tile = game_map.tile_array[int(new_point.x)][int(new_point.y)]
+            if "actioned" in new_point_tile.properties:
+                if new_point_tile.properties['actioned']:
+                   pass
+                elif "action_interactable" in new_point_tile.properties:
+                    interaction_type = new_point_tile.properties['interaction_type']
+                    # Interaction animation is already running, so don't run it
+                    # Most likely due to rapid double click
+                    if interaction_type in running_animation_names:
+                        return
+                    function_dict[interaction_type](new_point.x, new_point.y)
+                    running_animation_names.append(interaction_type)
+
     def draw(self, screen):
         self.image = self.image_row.next()
-        screen.blit(self.image, (self.pos[0] - TILE_WIDTH / 2, self.pos[1] - TILE_WIDTH / 2))
+        screen.blit(self.image, (self.pos[0] - constants.TILE_WIDTH / 2, self.pos[1] - constants.TILE_WIDTH / 2))
 
 
 running = True
@@ -218,13 +295,18 @@ running = True
 # player_images[n].iter()
 # image = player_images[n].next()
 
-player = Player(1, 1)
+player = Player(6, 8)
+inventory = Inventory(inventory_img, inventory_row_horizontal_img, inventory_slot_img)
+game = Game(inventory)
+
 
 def draw_grid_lines():
-    for x in range(0, SCREEN_WIDTH, TILE_WIDTH):
-        pg.draw.line(screen, (255, 0, 0), (x, 0), (x, SCREEN_HEIGHT))
-    for y in range(0, SCREEN_HEIGHT, TILE_WIDTH):
-        pg.draw.line(screen, (255, 0, 0), (0, y), (SCREEN_WIDTH, y))
+    for x in range(0, constants.SCREEN_WIDTH, constants.TILE_WIDTH):
+        pg.draw.line(screen, (255, 0, 0), (x, 0), (x, constants.SCREEN_HEIGHT))
+    for y in range(0, constants.SCREEN_HEIGHT, constants.TILE_WIDTH):
+        pg.draw.line(screen, (255, 0, 0), (0, y), (constants.SCREEN_WIDTH, y))
+
+
 while running:
     for e in pg.event.get():
         if e.type == QUIT:
@@ -232,19 +314,52 @@ while running:
             sys.exit()
         elif e.type == pg.KEYDOWN:
             pressed_keys = pg.key.get_pressed()
-            if (pressed_keys[K_UP] or pressed_keys[K_w] or pressed_keys[K_RIGHT] or pressed_keys[K_d]
-                    or pressed_keys[K_DOWN] or pressed_keys[K_s] or pressed_keys[K_LEFT] or pressed_keys[K_a]):
+            if  e.key in MOVEMENT_KEYS:
                 player.press_key(pressed_keys)
+            elif e.key in ACTION_KEYS:
+                player.action_event(e.key)
         elif e.type == pg.KEYUP:
-            if (e.key == K_UP or e.key == K_w or e.key == K_RIGHT or e.key == K_d
-                    or e.key == K_DOWN or e.key == K_s or e.key == K_LEFT or e.key == K_a):
+            if e.key in MOVEMENT_KEYS:
                 player.release_key(e.key)
-
     player.update()
-    sprite_group.draw(screen)
+    game_map.sprite_group.draw(screen)
+    # Draw all the animations, update the screen to the last image in the animation
+    for a in running_animation_names:
+        print("animation name")
+        print(a)
+    try:
+        # Perform animation actions on each animation
+        for animation in animations:
+            # Create a sprite to compare to the sprite group
+            tile_sprite = pg.sprite.Sprite
+            tile_sprite.rect = pg.rect.Rect(animation.x, animation.y, constants.TILE_WIDTH, constants.TILE_WIDTH)
+            # Get list of sprite collisions. Layers are stacked on top of each other, so there will be multiple.
+            # Top tile should always be the interaction object final state image
+            sprite_collisions = game_map.get_tiles(tile_sprite)
+            last_sprite = sprite_collisions[len(sprite_collisions) - 1]
+            last_sprite.image = animation.images[animation.count - 1]
+            screen.blit(sprite_collisions[len(sprite_collisions) - 2].image, tile_sprite.rect)
+            screen.blit(animation.next(), (animation.x, animation.y))
+    # Once the animation is done with all frames, it throws exception and ends up here
+    except:
+        # Delete animation
+        animations.remove(animation)
+        # Reset animation for next time its called
+        animation.iter()
+        running_animation_names.remove(animation.name)
+        # Make it so user can walk through the object. Used for doors and other objects that cause an
+        # animation to walk through
+        if "movement_interactable" in last_sprite.properties:
+            last_sprite.properties['traversable'] = True
+        # Set tile to actioned, which means the space button was pressed and the first action was performed on the object
+        # Typically used for chests, and such
+        if "action_interactable" in last_sprite.properties:
+            if "actioned" in last_sprite.properties:
+                last_sprite.properties['actioned'] = True
 
     player.draw(screen)
-    draw_grid_lines()
+    game.draw(screen)
+    #draw_grid_lines()
 
     pg.display.flip()
     clock.tick(FPS)

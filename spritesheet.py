@@ -3,7 +3,7 @@ import pygame
 class Spritesheet(object):
     def __init__(self, filename):
         try:
-            self.sheet = pygame.image.load(filename).convert()
+            self.sheet = pygame.image.load(filename).convert_alpha()
         except pygame.error as message:
             print('Unable to load spritesheet image:', filename)
             raise SystemExit(message)
@@ -11,7 +11,7 @@ class Spritesheet(object):
     def image_at(self, rectangle, colorkey = None):
         "Loads image from x,y,x+offset,y+offset"
         rect = pygame.Rect(rectangle)
-        image = pygame.Surface(rect.size).convert()
+        image = pygame.Surface(rect.size)
         image.blit(self.sheet, (0, 0), rect)
         if colorkey is not None:
             if colorkey is -1:
@@ -38,7 +38,7 @@ class SpriteStripAnim(object):
     strip wraps to the next row.
     """
 
-    def __init__(self, filename, rect, count, colorkey=None, loop=False, frames=1):
+    def __init__(self, filename, rect, count, colorkey=None, loop=False, frames=1, name=None, x=0, y=0):
         """construct a SpriteStripAnim
 
         filename, rect, count, and colorkey are the same arguments used
@@ -53,11 +53,14 @@ class SpriteStripAnim(object):
         self.filename = filename
         ss = Spritesheet(filename)
         self.images = ss.load_strip(rect, count, colorkey)
+        self.count = len(self.images)
         self.i = 0
         self.loop = loop
         self.frames = frames
         self.f = frames
-
+        self.x = x
+        self.y = y
+        self.name = name
     def flip_images(self):
         for i in range(len(self.images)):
             self.images[i] = pygame.transform.flip(self.images[i], True, False)
@@ -86,3 +89,36 @@ class SpriteStripAnim(object):
         self.images.extend(ss.images)
         return self
 
+
+class AnimationList(object):
+    def __init__(self, images, loop=False, frames=1, x=0, y=0, name=None):
+        self.images = images
+        self.loop = loop
+        self.frames = frames
+        self.f = frames
+        self.count = len(images)
+        self.i = 0
+        self.rect = self.images[0].get_rect()
+        self.x = x
+        self.y = y
+        self.name = name
+    def iter(self):
+        self.i = 0
+        self.f = self.frames
+        return self
+
+    def next(self):
+        if self.i >= self.count:
+            if not self.loop:
+                raise StopIteration
+            else:
+                self.i = 0
+        image = self.images[self.i]
+        self.f -= 1
+        if self.f == 0:
+            self.i += 1
+            self.f = self.frames
+        return image
+
+    def animate(self, screen):
+        screen.blit(self.next(), (self.x, self.y))

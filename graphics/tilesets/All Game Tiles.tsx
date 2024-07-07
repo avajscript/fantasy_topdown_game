@@ -10,24 +10,28 @@
  </tile>
  <tile id="1">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-0.png"/>
  </tile>
  <tile id="2">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-1.png"/>
  </tile>
  <tile id="3">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-2.png"/>
  </tile>
  <tile id="4">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-3.png"/>
@@ -40,48 +44,56 @@
  </tile>
  <tile id="6">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-5.png"/>
  </tile>
  <tile id="7">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-6.png"/>
  </tile>
  <tile id="8">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-7.png"/>
  </tile>
  <tile id="9">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-8.png"/>
  </tile>
  <tile id="10">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-9.png"/>
  </tile>
  <tile id="11">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-10.png"/>
  </tile>
  <tile id="12">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-11.png"/>
  </tile>
  <tile id="13">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/water/Water_Stone_Tile_2-12.png"/>
@@ -95,36 +107,42 @@
  </tile>
  <tile id="15">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_Tiles_2-0.png"/>
  </tile>
  <tile id="16">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_Tiles_2-1.png"/>
  </tile>
  <tile id="17">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_Tiles_2-2.png"/>
  </tile>
  <tile id="18">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_Tiles_2-3.png"/>
  </tile>
  <tile id="19">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_Tiles_2-4.png"/>
  </tile>
  <tile id="20">
   <properties>
+   <property name="movement_interactable" type="bool" value="false"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_Tiles_2-5.png"/>
@@ -377,19 +395,19 @@
  </tile>
  <tile id="62">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_Tiles_2-47.png"/>
  </tile>
  <tile id="63">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_Tiles_2-48.png"/>
  </tile>
  <tile id="64">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/grass/Grass_Tiles_2-49.png"/>
  </tile>
@@ -1392,7 +1410,7 @@
  </tile>
  <tile id="227">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-0.png"/>
  </tile>
@@ -1404,7 +1422,7 @@
  </tile>
  <tile id="229">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-2.png"/>
  </tile>
@@ -1434,7 +1452,7 @@
  </tile>
  <tile id="234">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-7.png"/>
  </tile>
@@ -1452,7 +1470,7 @@
  </tile>
  <tile id="237">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-10.png"/>
  </tile>
@@ -1464,19 +1482,19 @@
  </tile>
  <tile id="239">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-12.png"/>
  </tile>
  <tile id="240">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-13.png"/>
  </tile>
  <tile id="241">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-14.png"/>
  </tile>
@@ -1488,7 +1506,7 @@
  </tile>
  <tile id="243">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-16.png"/>
  </tile>
@@ -1506,7 +1524,7 @@
  </tile>
  <tile id="246">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-19.png"/>
  </tile>
@@ -1542,7 +1560,7 @@
  </tile>
  <tile id="252">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-25.png"/>
  </tile>
@@ -1560,7 +1578,7 @@
  </tile>
  <tile id="255">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/bridge/Bridge_Wood-28.png"/>
  </tile>
@@ -1629,7 +1647,7 @@
  </tile>
  <tile id="266">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
    <property name="type" value="wall"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/house/walls/House_Wood-3.png"/>
@@ -1721,37 +1739,37 @@
  </tile>
  <tile id="280">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/house/walls/Wood_Door_Anim-0.png"/>
  </tile>
  <tile id="281">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/house/walls/Wood_Door_Anim-1.png"/>
  </tile>
  <tile id="282">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/house/walls/Wood_Door_Anim-2.png"/>
  </tile>
  <tile id="283">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/house/walls/Wood_Door_Anim-3.png"/>
  </tile>
  <tile id="284">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/house/walls/Wood_Door_Anim-4.png"/>
  </tile>
  <tile id="285">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/house/walls/Wood_Door_Anim-5.png"/>
  </tile>
@@ -1872,6 +1890,9 @@
  </tile>
  <tile id="306">
   <properties>
+   <property name="action_interactable" type="bool" value="true"/>
+   <property name="actioned" type="bool" value="false"/>
+   <property name="interaction_type" value="chest"/>
    <property name="traversable" type="bool" value="false"/>
   </properties>
   <image width="16" height="16" source="../split_tiles/house/objects/indoor_decorations/Indoor_Decor-11.png"/>
@@ -4585,7 +4606,7 @@
  </tile>
  <tile id="755">
   <properties>
-   <property name="traversable" type="bool" value="false"/>
+   <property name="traversable" type="bool" value="true"/>
    <property name="type" value=""/>
   </properties>
   <image width="16" height="16" source="../split_tiles/house/walls2/House_Wood-3.png"/>

@@ -3,22 +3,23 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tilesets/All Game Tiles.tsx",
+    "activeFile": "",
     "expandedProjectPaths": [
     ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "main_map.tmx": {
-            "scale": 2,
-            "selectedLayer": 3,
+            "scale": 1.5,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 475.5,
-                "y": 172.75
+                "x": 350.6666666666667,
+                "y": 230.33333333333337
             }
         },
         "tilesets/All Game Tiles.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 1.5,
-            "scaleInEditor": 1.5
+            "scaleInEditor": 1
         },
         "tilesets/Grass Tiles 2.tsx": {
             "dynamicWrapping": false,
@@ -52,8 +53,6 @@
     "map.tileWidth": 16,
     "map.width": 50,
     "openFiles": [
-        "main_map.tmx",
-        "tilesets/All Game Tiles.tsx"
     ],
     "project": "fantasy_project.tiled-project",
     "property.type": "string",
