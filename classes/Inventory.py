@@ -30,7 +30,12 @@ class Inventory(pg.sprite.Sprite):
         self.inventory_row_rect: pg.Rect = self.inventory_row_img.get_rect(topleft=(self.inventory_rect.topleft[0] - self.inventory_row_img.get_width() - constants.SPACING, self.inventory_rect.topleft[1]))
 
         self.inventory_slot_img: pg.Surface = inventory_slot_img
+        self.inventory_slot_base_img = inventory_slot_img
         self.inventory_slot_rect = self.inventory_slot_img.get_rect(topleft = (self.inventory_row_rect.topleft[0] - self.inventory_slot_img.get_width() - constants.SPACING, self.inventory_row_rect.topleft[1]))
+        self.inventory_slot_img_rect = copy.deepcopy(self.inventory_slot_rect)
+        self.inventory_slot_img_rect.x += constants.SPACING / 2
+        self.inventory_slot_img_rect.y += constants.SPACING / 2
+
 
     # Conditionally draw the inventory based on draw state
     def draw(self, screen: pg.Surface, draw_state: InventoryDrawing):
@@ -38,6 +43,11 @@ class Inventory(pg.sprite.Sprite):
             screen.blit(self.inventory_img, self.inventory_rect)
             screen.blit(self.inventory_row_img, self.inventory_row_rect)
             screen.blit(self.inventory_slot_img, self.inventory_slot_rect)
+
+            # Draw main item if it exists
+            if self.equipped_main_item is not None:
+                screen.blit(constants.dyn_loaded_images[self.equipped_main_item["name"]], self.inventory_slot_img_rect)
+
 
         elif InventoryDrawing.ROW_AND_SLOT:
             pass

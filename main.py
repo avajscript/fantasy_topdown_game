@@ -1,10 +1,13 @@
 import copy
 import string
 import sys
+from typing import List
+
 import pygame as pg
 import pytmx
 from pytmx.util_pygame import load_pygame
 import constants
+from classes.Interactable_Objects import InteractableObject, Chest
 from spritesheet import AnimationList
 from enum import Enum
 
@@ -66,6 +69,9 @@ animations_dict["chest"] = chest_animation
 animations = []
 running_animation_names = []
 loaded_files = []
+# The list interactable objects to be drawn on the screen. Chests and such.
+interactable_objects = pg.sprite.Group()
+
 
 def door_animation(x, y):
     animations_dict["door"].x = x * constants.TILE_WIDTH
@@ -81,13 +87,25 @@ def chest_animation(x, y):
     # animations_dict.iter()
     animations.append(animations_dict["chest"])
 
-def chest_one():
-    pass
+
+def open_chest(items: string, coords: tuple):
+    """
+    Creates a chest object and adds it to the list of interactable_objects, which will be drawn in the game loop
+    It will be removed when the user closes it
+    :param items: List of items to be added to the chest
+    :param coords: the coordinates (x, y) to draw the chest
+    :return:
+    """
+    chest: Chest = Chest(items=items, chest_image=inventory_img, x=coords[0]+1, y=coords[1])
+
+    chest.redraw_images()
+    interactable_objects.add(chest)
+
 
 function_dict = {
     "door": door_animation,
     "chest": chest_animation,
-    "chest1": chest_one
+    "openchest": open_chest
 }
 
 
@@ -176,7 +194,6 @@ class Player(pg.sprite.Sprite):
         self.keys_pressed = []
 
     def press_key(self, pressed_keys):
-
         # Key up
         if pressed_keys[K_UP] or pressed_keys[K_w]:
             self.keys_pressed.append("up")
@@ -271,10 +288,14 @@ class Player(pg.sprite.Sprite):
         elif key == K_SPACE:
             # get the tile the player is interacting with (in front of him)
             new_point = self.point + self.dirvec
-            new_point_tile = game_map.tile_array[int(new_point.x)][int(new_point.y)]
+            new_point_tile: Tile = game_map.tile_array[int(new_point.x)][int(new_point.y)]
             if "actioned" in new_point_tile.properties:
                 if new_point_tile.properties['actioned']:
-                   pass
+                    if new_point_tile.properties['interaction_type'] == 'chest':
+                        # Open the chest display with the tile object properties
+                        function_dict["openchest"](new_point_tile.properties['items'], new_point_tile.coords)
+
+                # Run the first animation of the interactable object
                 elif "action_interactable" in new_point_tile.properties:
                     interaction_type = new_point_tile.properties['interaction_type']
                     # Interaction animation is already running, so don't run it
@@ -295,7 +316,7 @@ running = True
 # player_images[n].iter()
 # image = player_images[n].next()
 
-player = Player(6, 8)
+player = Player(6, 5)
 inventory = Inventory(inventory_img, inventory_row_horizontal_img, inventory_slot_img)
 game = Game(inventory)
 
@@ -314,13 +335,31 @@ while running:
             sys.exit()
         elif e.type == pg.KEYDOWN:
             pressed_keys = pg.key.get_pressed()
-            if  e.key in MOVEMENT_KEYS:
+            # Player movement
+            if e.key in MOVEMENT_KEYS:
                 player.press_key(pressed_keys)
+            # Player action
             elif e.key in ACTION_KEYS:
                 player.action_event(e.key)
+        # Key release
         elif e.type == pg.KEYUP:
             if e.key in MOVEMENT_KEYS:
                 player.release_key(e.key)
+        # Mouse press
+        elif e.type == pg.MOUSEBUTTONDOWN:
+            # Left mouse button press
+            if e.button == 1:
+                # Check for collisions between all interactable objects
+                mouse_pos = pg.mouse.get_pos()
+                mouse_pos_sprite: pg.sprite.Sprite = pg.sprite.Sprite
+                mouse_pos_sprite.rect = pg.Rect(mouse_pos[0], mouse_pos[1], 1, 1)
+                collisions = pg.sprite.spritecollide(mouse_pos_sprite, interactable_objects, False)
+                # Perform the click action on the interactable object
+                for int_obj in collisions:
+                    item = int_obj.click_action(mouse_pos[0], mouse_pos[1])
+                    # If user clicked an empty chest slot, this will return none
+                    if item is not None:
+                        inventory.loot_item(item)
     player.update()
     game_map.sprite_group.draw(screen)
     # Draw all the animations, update the screen to the last image in the animation
@@ -358,6 +397,7 @@ while running:
                 last_sprite.properties['actioned'] = True
 
     player.draw(screen)
+    interactable_objects.draw(screen)
     game.draw(screen)
     #draw_grid_lines()
 
