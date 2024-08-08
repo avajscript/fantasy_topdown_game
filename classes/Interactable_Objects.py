@@ -3,6 +3,7 @@ import json
 import string
 
 from pygame import Surface, image, sprite
+from classes.Tile import Tile
 import os
 import constants
 from abc import ABC, abstractmethod
@@ -19,8 +20,9 @@ class InteractableObject(ABC):
 
 
 class Chest(InteractableObject, sprite.Sprite):
-    def __init__(self, items: string, chest_image: Surface, x: int, y: int):
+    def __init__(self, tile: Tile, items: string, chest_image: Surface, x: int, y: int):
         super(Chest, self).__init__()
+        self.chest_tile = tile
         self.items = [
             [None, None, None, None],
             [None, None, None, None],
@@ -77,7 +79,7 @@ class Chest(InteractableObject, sprite.Sprite):
         item = self.items[relative_x_coord][relative_y_coord]
         self.items[relative_x_coord][relative_y_coord] = None
         self.redraw_images()
-        return item
+        return [item, self.chest_tile]
 
     def print_items(self):
         for row in self.items:

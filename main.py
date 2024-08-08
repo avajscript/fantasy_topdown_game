@@ -7,8 +7,9 @@ import pygame as pg
 import pytmx
 from pytmx.util_pygame import load_pygame
 import constants
-from classes.Interactable_Objects import InteractableObject, Chest
 from classes.Tile import Tile
+from classes.Interactable_Objects import InteractableObject, Chest
+from classes.TileUtility import TileUtility
 from spritesheet import AnimationList
 from enum import Enum
 
@@ -89,7 +90,7 @@ def chest_animation(x, y):
     animations.append(animations_dict["chest"])
 
 
-def open_chest(items: string, coords: tuple):
+def open_chest(tile: Tile, items: string, coords: tuple):
     """
     Creates a chest object and adds it to the list of interactable_objects, which will be drawn in the game loop
     It will be removed when the user closes it
@@ -97,13 +98,13 @@ def open_chest(items: string, coords: tuple):
     :param coords: the coordinates (x, y) to draw the chest
     :return:
     """
-    chest: Chest = Chest(items=items, chest_image=inventory_img, x=coords[0]+1, y=coords[1])
+    chest: Chest = Chest(tile=tile, items=items, chest_image=inventory_img, x=coords[0]+1, y=coords[1])
 
     chest.redraw_images()
     interactable_objects.add(chest)
 
 
-def delete_iteractable_objects():
+def delete_interactable_objects():
     interactable_objects.empty()
 
 
@@ -154,16 +155,39 @@ player_anim_dict = {
     "right": 1,
     "up": 2,
     "left": 3,
+
     "downWalk": 4,
     "rightWalk": 5,
     "upWalk": 6,
     "leftWalk": 7,
-    "downAttack": 8,
-    "rightAttack": 9,
-    "upAttack": 10,
-    "leftAttack": 11,
+
+    "down_sword": 8,
+    "right_sword": 9,
+    "up_sword": 10,
+    "left_sword": 11,
+
     "rightCrawl": 12,
-    "leftCrawl": 13
+    "leftCrawl": 13,
+
+    "down_pickaxe": 14,
+    "right_pickaxe": 15,
+    "up_pickaxe": 16,
+    "left_pickaxe": 17,
+
+    "down_hatchet": 18,
+    "right_hatchet": 19,
+    "up_hatchet": 20,
+    "left_hatchet": 21,
+
+    "down_hoe": 22,
+    "right_hoe": 23,
+    "up_hoe": 24,
+    "left_hoe": 25,
+
+    "down_water": 26,
+    "right_water": 27,
+    "up_water": 28,
+    "left_water": 29
 }
 
 
@@ -176,9 +200,11 @@ class Game:
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, player_inv: Inventory, x, y):
         super(Player, self).__init__()
+        self.inv = player_inv
         self.pos = pg.math.Vector2(x * constants.TILE_WIDTH, y * constants.TILE_WIDTH)
+        # x, y
         self.dirvec = pg.math.Vector2(0, 0)
         self.new_pos = [x * constants.TILE_WIDTH, y * constants.TILE_WIDTH]
         self.point = pg.math.Vector2(x, y)
@@ -187,8 +213,29 @@ class Player(pg.sprite.Sprite):
         self.player_action_images = player_actions
         self.image = player_images[0].next()
         self.image_row = player_images[0]
+        self.prev_motion_row = player_images[0]
         self.current_keys = (0, 0)
         self.keys_pressed = []
+
+    def get_dir_string(self):
+        """
+        Gets the string value of the direction the player is facing
+        :return: The direction the player is currently facing
+        :rtype: str
+        """
+        direction = None
+        if self.dirvec[0] != 0:
+            if self.dirvec[0] > 0:
+                direction = "right"
+            else:
+                direction = "left"
+        else:
+            if self.dirvec[1] > 0:
+                direction = "down"
+            else:
+                direction = "up"
+
+        return direction
 
     def press_key(self, pressed_keys):
         # Key up
@@ -274,6 +321,7 @@ class Player(pg.sprite.Sprite):
             elif key == K_LEFT or key == K_a:
                 self.image_row = self.player_images[player_anim_dict["left"]]
                 key_to_remove = "left"
+            self.prev_motion_row = self.image_row
         self.keys_pressed = [key_press for key_press in self.keys_pressed if key_press != key_to_remove]
 
     def detect_hide_interactable_objects(self):
@@ -289,9 +337,9 @@ class Player(pg.sprite.Sprite):
         print(type(new_point_tile.properties))
         if "action_interactable" in new_point_tile.properties:
             if new_point_tile.properties["action_interactable"] is not True:
-                delete_iteractable_objects()
+                delete_interactable_objects()
         else:
-            delete_iteractable_objects()
+            delete_interactable_objects()
 
 
     def action_event(self, key):
@@ -301,6 +349,13 @@ class Player(pg.sprite.Sprite):
             pass
             # Perform the interaction based on the tile in front of the player
         elif key == K_SPACE:
+            print("inventor")
+            equipped_item: string = player.inv.get_equipped_item_name()
+            direction: string = self.get_dir_string()
+            if direction is not None and equipped_item is not None:
+                print("dir string")
+                print(direction + "_" + equipped_item)
+                self.image_row = self.player_images[player_anim_dict[direction + "_" + equipped_item]]
             # get the tile the player is interacting with (in front of him)
             new_point = self.point + self.dirvec
             new_point_tile: Tile = game_map.tile_array[int(new_point.x)][int(new_point.y)]
@@ -308,7 +363,7 @@ class Player(pg.sprite.Sprite):
                 if new_point_tile.properties['actioned']:
                     if new_point_tile.properties['interaction_type'] == 'chest':
                         # Open the chest display with the tile object properties
-                        function_dict["openchest"](new_point_tile.properties['items'], new_point_tile.coords)
+                        function_dict["openchest"](new_point_tile, new_point_tile.properties['items'], new_point_tile.coords)
 
                 # Run the first animation of the interactable object
                 elif "action_interactable" in new_point_tile.properties:
@@ -321,7 +376,11 @@ class Player(pg.sprite.Sprite):
                     running_animation_names.append(interaction_type)
 
     def draw(self, screen):
-        self.image = self.image_row.next()
+        try:
+            self.image = self.image_row.next()
+        except:
+            self.image_row = self.prev_motion_row
+            self.image = self.image_row.next()
         screen.blit(self.image, (self.pos[0] - constants.TILE_WIDTH / 2, self.pos[1] - constants.TILE_WIDTH / 2))
 
 
@@ -331,8 +390,9 @@ running = True
 # player_images[n].iter()
 # image = player_images[n].next()
 
-player = Player(6, 5)
+
 inventory = Inventory(inventory_img, inventory_row_horizontal_img, inventory_slot_img)
+player = Player(inventory, 6, 5)
 game = Game(inventory)
 
 
@@ -373,10 +433,13 @@ while running:
                 collisions = pg.sprite.spritecollide(mouse_pos_sprite, interactable_objects, False)
                 # Perform the click action on the interactable object
                 for int_obj in collisions:
-                    item = int_obj.click_action(mouse_pos[0], mouse_pos[1])
+                    [item, chest_tile] = int_obj.click_action(mouse_pos[0], mouse_pos[1])
                     # If user clicked an empty chest slot, this will return none
                     if item is not None:
                         inventory.loot_item(item)
+                        print("item")
+                        print(item)
+                        TileUtility.remove_item(chest_tile, item)
 
     player.update()
     game_map.sprite_group.draw(screen)

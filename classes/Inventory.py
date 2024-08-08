@@ -36,6 +36,21 @@ class Inventory(pg.sprite.Sprite):
         self.inventory_slot_img_rect.x += constants.SPACING / 2
         self.inventory_slot_img_rect.y += constants.SPACING / 2
 
+    def is_item_equipped(self):
+        """
+        Check if an item is equipped
+        :return: True if item is equipped
+        :rtype: bool
+        """
+        return self.equipped_main_item is not None
+
+    def get_equipped_item_name(self):
+        """
+        Return the name of the equipped item
+        :return: The name of the equipped item or None if it's empty
+        :rtype: str
+        """
+        return self.equipped_main_item['name'] if self.equipped_main_item is not None else None
 
     # Conditionally draw the inventory based on draw state
     def draw(self, screen: pg.Surface, draw_state: InventoryDrawing):

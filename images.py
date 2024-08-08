@@ -7,34 +7,81 @@ split_tiles_path = "graphics/split_tiles"
 FPS = 60
 frames = FPS / 10
 player_images = [
-    # down
+    # Walking
+    # down - 0
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 0, 32, 32), 6, -1, True, frames),
-    # right
+    # right - 1
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 32, 32, 32), 6, -1, True, frames),
-    # up
+    # up - 2
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 64, 32, 32), 6, -1, True, frames),
-    # left
+    # left - 3
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 32, 32, 32), 6, -1, True, frames).flip_images(),
-    # down run
+
+    # Running
+    # down run - 4
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 96, 32, 32), 6, -1, True, frames),
-    # right run
+    # right run - 5
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 128, 32, 32), 6, -1, True, frames),
-    # up run
+    # up run - 6
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 160, 32, 32), 6, -1, True, frames),
-    # left run
+    # left run - 7
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 128, 32, 32), 6, -1, True, frames).flip_images(),
-    # attack down
-    SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 192, 32, 32), 4, -1, True, frames),
-    # attack right
-    SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 224, 32, 32), 4, -1, True, frames),
-    # attack up
-    SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 256, 32, 32), 4, -1, True, frames),
-    # attack left
-    SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 224, 32, 32), 4, -1, True, frames).flip_images(),
-    # crawl right
+
+    # Attacking
+    # attack down - 8
+    SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 192, 32, 32), 4, -1, False, frames),
+    # attack right - 9
+    SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 288, 32, 32), 4, -1, False, frames),
+    # attack up - 10
+    SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 384, 32, 32), 4, -1, False, frames),
+    # attack left - 11
+    SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 288, 32, 32), 4, -1, False, frames).flip_images(),
+
+    # Crawling
+    # crawl right - 12
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 288, 32, 32), 4, -1, True, frames),
-    # crawl left
+    # crawl left - 13
     SpriteStripAnim(os.path.join(path, "Player/Player.png"), (0, 288, 32, 32), 4, -1, True, frames).flip_images(),
+
+    # Mining
+    # Mine down - 14
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 32, 32, 32), 5, -1, True, frames),
+    # Mine right - 15
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 0, 32, 32), 5, -1, True, frames),
+    # Mine up - 16
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 64, 32, 32), 5, -1, True, frames),
+    # Mine left - 17
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 0, 32, 32), 5, -1, True, frames).flip_images(),
+
+    # Chopping
+    # Chop down - 18
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 128, 32, 32), 5, -1, True, frames),
+    # Chop right - 19
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 96, 32, 32), 5, -1, True, frames),
+    # Chop up - 20
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 160, 32, 32), 5, -1, True, frames),
+    # Chop left - 21
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 96, 32, 32), 5, -1, True, frames).flip_images(),
+
+    # Digging
+    # Dig down - 22
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 224, 32, 32), 5, -1, True, frames),
+    # Dig right - 23
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 192, 32, 32), 5, -1, True, frames),
+    # Dig up - 24
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 256, 32, 32), 5, -1, True, frames),
+    # Dig left - 25
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 192, 32, 32), 5, -1, True, frames).flip_images(),
+
+    # Watering
+    # Water down - 26
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 288, 32, 32), 5, -1, True, frames),
+    # Water right - 27
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 352, 32, 32), 5, -1, True, frames),
+    # Water right - 28
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 352, 32, 32), 5, -1, True, frames),
+    # Water left - 29
+    SpriteStripAnim(os.path.join(path, "Player/Player_Actions.png"), (0, 352, 32, 32), 5, -1, True, frames).flip_images(),
 ]
 
 player_actions = [
