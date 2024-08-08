@@ -8,6 +8,7 @@ import pytmx
 from pytmx.util_pygame import load_pygame
 import constants
 from classes.Interactable_Objects import InteractableObject, Chest
+from classes.Tile import Tile
 from spritesheet import AnimationList
 from enum import Enum
 
@@ -102,6 +103,10 @@ def open_chest(items: string, coords: tuple):
     interactable_objects.add(chest)
 
 
+def delete_iteractable_objects():
+    interactable_objects.empty()
+
+
 function_dict = {
     "door": door_animation,
     "chest": chest_animation,
@@ -121,14 +126,6 @@ class GameMap:
 
 
 # x, y coordinates that match the tile in that position [50][40]
-
-class Tile(pg.sprite.Sprite):
-    def __init__(self, pos, surf, groups, properties, coords):
-        super().__init__(groups)
-        self.image = surf
-        self.rect = self.image.get_rect(topleft=pos)
-        self.properties = properties
-        self.coords = coords
 
 
 layers = map_one_tmx.layers
@@ -279,11 +276,29 @@ class Player(pg.sprite.Sprite):
                 key_to_remove = "left"
         self.keys_pressed = [key_press for key_press in self.keys_pressed if key_press != key_to_remove]
 
+    def detect_hide_interactable_objects(self):
+        """
+        Checks if the tile the player is moving onto is the current interactable object (chest, etc)
+        If not, then delete all interactable objects.
+        This means the player moved away from the interaction, so we should hide it from the screen.
+        :return: None
+        """
+        new_point = self.point + self.dirvec
+        new_point_tile: Tile = game_map.tile_array[int(new_point.x)][int(new_point.y)]
+        print(new_point_tile.properties)
+        print(type(new_point_tile.properties))
+        if "action_interactable" in new_point_tile.properties:
+            if new_point_tile.properties["action_interactable"] is not True:
+                delete_iteractable_objects()
+        else:
+            delete_iteractable_objects()
+
+
     def action_event(self, key):
         if key == K_q:
-            print("q")
+            pass
         elif key == K_e:
-            print("e")
+            pass
             # Perform the interaction based on the tile in front of the player
         elif key == K_SPACE:
             # get the tile the player is interacting with (in front of him)
@@ -338,6 +353,8 @@ while running:
             # Player movement
             if e.key in MOVEMENT_KEYS:
                 player.press_key(pressed_keys)
+                if len(interactable_objects) > 0:
+                    player.detect_hide_interactable_objects()
             # Player action
             elif e.key in ACTION_KEYS:
                 player.action_event(e.key)
@@ -360,12 +377,12 @@ while running:
                     # If user clicked an empty chest slot, this will return none
                     if item is not None:
                         inventory.loot_item(item)
+
     player.update()
     game_map.sprite_group.draw(screen)
     # Draw all the animations, update the screen to the last image in the animation
     for a in running_animation_names:
-        print("animation name")
-        print(a)
+        pass
     try:
         # Perform animation actions on each animation
         for animation in animations:

@@ -31,8 +31,9 @@ class Chest(InteractableObject, sprite.Sprite):
             self.items[i % 4][int(i / 4)] = item
 
         self.image = chest_image
+        self.inventory_image = chest_image
         self.rect = self.image.get_rect(topleft=(x * constants.TILE_WIDTH, y * constants.TILE_WIDTH))
-        self.inventory_image = None
+
         self.x = x
         self.y = y
 
@@ -42,7 +43,7 @@ class Chest(InteractableObject, sprite.Sprite):
         :return:
         """
         # Redraw the background image for the chest
-        self.inventory_image = self.image.copy()
+        self.image = self.inventory_image.copy()
         # Iterate over each item to load the image and draw it on the correct location on the self.inventory_image
         for y, row in enumerate(self.items):
             for x, item in enumerate(row):
@@ -55,7 +56,8 @@ class Chest(InteractableObject, sprite.Sprite):
                     constants.dyn_loaded_images[item["name"]] = img
                 # This will draw the loaded inventory image in the proper grid section.
                 # Ex. 4x4 grid of items first will be 0,0, etc
-                self.inventory_image.blit(img, (x * constants.TILE_WIDTH + constants.SPACING / 2, y / constants.INVENTORY_TILE_WIDTH + constants.SPACING / 2))
+                print("blitted sword")
+                self.image.blit(img, (x * constants.TILE_WIDTH + constants.SPACING / 2, y / constants.INVENTORY_TILE_WIDTH + constants.SPACING / 2))
 
     def draw(self, screen: Surface):
         """
